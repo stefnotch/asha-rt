@@ -1,3 +1,8 @@
+#ifdef _WIN32
+    #include <windows.h>
+    #include <gl/GL.h>
+#endif
+
 #include <array>
 #include <asha.hpp>
 #include <chrono>
