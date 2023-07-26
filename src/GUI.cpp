@@ -24,7 +24,7 @@ GUI::GUI(std::string title, int width, int height){
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     ImGui_ImplGlfw_InitForOpenGL(wm_ctx, true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init("#version 410");
     ImGui::StyleColorsDark();
     font_scale = io.FontGlobalScale * 2;
     io.FontGlobalScale = font_scale;
