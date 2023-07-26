@@ -83,7 +83,7 @@ void ASHA::Adapter::updateScanResults(){
             }
             catch(const std::exception& e)
             {
-                std::cerr << e.what() << ' : 86 \n';
+                std::cerr << e.what() << " : 86 \n";
             }
             std::cout << "Connected : asha.cpp 88" << std::endl;
             continue;
@@ -143,5 +143,7 @@ bool ASHA::Peer::isASHA(){
     device.disconnect();
     return false;
 }
+
+
 
 #endif
