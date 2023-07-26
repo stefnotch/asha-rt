@@ -5,7 +5,12 @@ include_directories(include)
 add_executable(ashart src/main.cpp src/asha.cpp src/GUI.cpp)
 set_property(TARGET ashart PROPERTY CXX_STANDARD 20)
 set_property(TARGET ashart PROPERTY CXX_STANDARD_REQUIRED On)
+if (WIN32)
+link_libraries(opengl32)
+endif()
+if (UNIX)
 link_libraries(GL)
+endif()
 # add_library(asha src/asha.cpp)
 
 # SimpleBLE

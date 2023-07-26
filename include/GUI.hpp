@@ -6,8 +6,10 @@
 #include <array>
 #include <asha.hpp>
 #include <chrono>
+#ifdef __linux__
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
+#endif
 #endif
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -32,16 +34,17 @@ private:
     ImGuiViewport             *imgui_vp;
     ASHA::Adapter             *bt_adapter;
     ASHA::DevicePair           devices;
-    bool                       inLeftScan;
-    bool                       inRightScan;
+    bool                       inLeftScan  = false;
+    bool                       inRightScan = false;
     precise_clock::time_point  timer;
     enum {
-        NO_ADAPTER, BT_OFF, STANDARD
+        NO_ADAPTER, BT_OFF, NOT_ASHA, STANDARD
     } UI_State;
     void createBaseWindow();
     void endBaseWindow();
     void noAdapter();
     void bluetoothOff();
+    void notASHA();
     void drawLeftDevice();
     void drawLeftSelect();
     void drawRightDevice();

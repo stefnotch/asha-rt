@@ -67,26 +67,17 @@ void ASHA::Adapter::updateScanResults(){
     std::vector<SimpleBLE::Peripheral> results = hostAdapter.scan_get_results();
     for (SimpleBLE::Peripheral peer : results){
         if (peer.rssi() < -75){ continue; }
-        // if (peer.identifier().length() > 0){ continue; }
-        for (SimpleBLE::Service s : peer.services()){
-            std::cout << s.uuid() << std::endl;
-        }
-        if (peer.identifier().length() == 0){ 
+        if (peer.identifier().length() == 0){
             peer.connect();
-        }
-        for (int count = 0; count < 100; ++count){
-            std::this_thread::sleep_for(
-                std::chrono::microseconds(50)
-            );
-        }
-        if (peer.is_paired()){
+            continue;
+        } else if (peer.is_connected()){
+            peer.unpair();
             peer.disconnect();
         }
-        if (peer.identifier().length() == 0){ continue; }
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
-                ASHA::Peer(this, &peer)
+                ASHA::Peer(this, peer)
             }
         );
     }
@@ -101,18 +92,35 @@ bool ASHA::Adapter::isScanning(){
     return hostAdapter.scan_is_active();
 }
 
+void ASHA::Adapter::scanConnect(SimpleBLE::Peripheral &peer){
+}
+
 ///////////////////////////////////////////////////////////////////////////////////
 ASHA::Peer::Peer(){}
 
-ASHA::Peer::Peer(ASHA::Adapter* hostAdapter, SimpleBLE::Peripheral* device){
+ASHA::Peer::Peer(ASHA::Adapter* hostAdapter, SimpleBLE::Peripheral &device){
     adapter = hostAdapter;
     this->device = device;
 }
 
-bool ASHA::Peer::isPaired(){
+bool ASHA::Peer::isConnected(){
     if (deviceSet){
-        return device->is_paired();
+        return device.is_connected();
     }
+    return false;
+}
+
+bool ASHA::Peer::isASHA(){
+    if (!isConnected()){
+        device.connect();
+    }
+    for (SimpleBLE::Service serv : device.services()){
+        if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
+            return true;
+        }
+    }
+    device.unpair();
+    device.disconnect();
     return false;
 }
 

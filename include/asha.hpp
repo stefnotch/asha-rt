@@ -9,10 +9,10 @@
 
 namespace ASHA {
 
+const std::string SERVICE_UUID = "0000FDF0";
+
 struct ScanPeer;
 struct DevicePair;
-
-const std::chrono::duration BLE_SCAN_PAUSE = std::chrono::seconds(10);
 
 class Adapter {
 private:
@@ -31,18 +31,21 @@ public:
     std::vector<ASHA::ScanPeer> getLastScan();
     std::vector<std::map<uint16_t, std::string>> queryDevices(int);
     bool isScanning();
+
+    static void scanConnect(SimpleBLE::Peripheral&);
 };
 
 class Peer {
 private:
     ASHA::Adapter         *adapter;
     bool                   adapterSet = false;
-    SimpleBLE::Peripheral *device;
+    SimpleBLE::Peripheral  device;
     bool                   deviceSet  = false;
 public:
     Peer();
-    Peer(ASHA::Adapter*, SimpleBLE::Peripheral*);
-    bool isPaired();
+    Peer(ASHA::Adapter*, SimpleBLE::Peripheral&);
+    bool isConnected();
+    bool isASHA();
 };
 
 struct ScanPeer {
