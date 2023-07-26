@@ -63,17 +63,30 @@ void ASHA::Adapter::startScan(){
 }
 
 void ASHA::Adapter::updateScanResults(){
+    std::cout << "Updating scan results : asha.cpp 66" << std::endl;
     lastScan.clear();
+    std::cout << "Fetching from adapter : asha.cpp 68" << std::endl;
     std::vector<SimpleBLE::Peripheral> results = hostAdapter.scan_get_results();
+    std::cout << "Iterating devices : asha.cpp 70" << std::endl;
     for (SimpleBLE::Peripheral peer : results){
-        if (peer.rssi() < -75){ continue; }
+        std::cout << std::endl << "Next Device" << std::endl;
+        if (peer.rssi() < -75){ 
+            std::cout << "Device proximity too far : asha.cpp 74" << std::endl;
+            continue; 
+        }
         if (peer.identifier().length() == 0){
+            if (peer.is_connected()){ continue; }
+            std::cout << "ID length 0... connecting : asha.cpp 79" << std::endl;
             peer.connect();
+            std::cout << "Connected : asha.cpp 81" << std::endl;
             continue;
         } else if (peer.is_connected()){
+            std::cout << "Disconnecting : asha.cpp 84" << std::endl;
             peer.unpair();
             peer.disconnect();
+            std::cout << "Disconnected : asha.cpp 87" << std::endl;
         }
+        std::cout << "Added device to results : asha.cpp 89" << std::endl;
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
