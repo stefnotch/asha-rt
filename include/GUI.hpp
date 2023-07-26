@@ -3,6 +3,10 @@
     #include <gl/GL.h>
 #endif
 
+#ifdef __APPLE__
+    #include <OpenGL/OpenGL.h>
+#endif
+
 #include <array>
 #include <asha.hpp>
 #include <chrono>
