@@ -11,6 +11,9 @@ endif()
 if (UNIX)
 link_libraries(GL)
 endif()
+if (APPLE)
+link_libraries(OpenGL)
+endif()
 # add_library(asha src/asha.cpp)
 
 # SimpleBLE
