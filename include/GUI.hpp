@@ -4,7 +4,7 @@
 #endif
 
 #ifdef __APPLE__
-    #include <OpenGL/OpenGL.h>
+    #include <OpenGL/gl.h>
 #endif
 
 #include <array>
