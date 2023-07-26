@@ -130,6 +130,9 @@ void GUI::drawLeftDevice(){
             inLeftScan = true;
             drawLeftSelect();
         }
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)){
+            ImGui::SetTooltip("Click me to scan");
+        }
         ImGui::PopStyleColor(3);
     }
 }
@@ -202,6 +205,9 @@ void GUI::drawRightDevice(){
         if (ImGui::Button("Right Not Paired", buttonSize) || inRightScan){
             inRightScan = true;
             drawRightSelect();
+        }
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)){
+            ImGui::SetTooltip("Click me to scan");
         }
         ImGui::PopStyleColor(3);
     }
