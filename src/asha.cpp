@@ -77,16 +77,23 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
             std::cout << "ID length 0... connecting : asha.cpp 79" << std::endl;
-            peer.connect();
-            std::cout << "Connected : asha.cpp 81" << std::endl;
+            try
+            {
+                peer.connect();
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << ' : 86 \n';
+            }
+            std::cout << "Connected : asha.cpp 88" << std::endl;
             continue;
         } else if (peer.is_connected()){
-            std::cout << "Disconnecting : asha.cpp 84" << std::endl;
+            std::cout << "Disconnecting : asha.cpp 91" << std::endl;
             peer.unpair();
             peer.disconnect();
-            std::cout << "Disconnected : asha.cpp 87" << std::endl;
+            std::cout << "Disconnected : asha.cpp 94" << std::endl;
         }
-        std::cout << "Added device to results : asha.cpp 89" << std::endl;
+        std::cout << "Added device to results : asha.cpp 96" << std::endl;
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
