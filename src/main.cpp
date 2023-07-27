@@ -1,5 +1,6 @@
 #include <GUI.hpp>
 #include <iostream>
+#include <bitset>
 
 int main(){
     ASHA::Adapter adapter;

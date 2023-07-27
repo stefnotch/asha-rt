@@ -1,10 +1,7 @@
-#include <vector>
-
 #ifndef ASHA_H
 #define ASHA_H
 
 #include <asha.hpp>
-#include <thread>
 
 ASHA::Adapter::Adapter(){
     std::vector<SimpleBLE::Adapter> adapters = SimpleBLE::Adapter::get_adapters();
@@ -29,32 +26,32 @@ ASHA::Adapter::queryNames(int scanDuration){
     std::vector<
         std::pair<std::string, SimpleBLE::BluetoothAddress>
     > returnData;
-    if (!foundAdapter || !SimpleBLE::Adapter::bluetooth_enabled()){
-        return returnData;
-    }
-    this->hostAdapter.scan_for(scanDuration * 1000);
-    for (SimpleBLE::Peripheral device : this->hostAdapter.scan_get_results()){
-        if (device.rssi() < -75){ continue; }
-        if (device.identifier().length() > 0){ continue; }
-        device.connect();
-        while (!device.is_connected()){
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(1)
-            );
-        }
-        while (device.identifier().length() == 0){
-            std::this_thread::sleep_for(
-                std::chrono::milliseconds(1)
-            );
-        }
-        returnData.push_back(
-            std::make_pair(
-                device.identifier(),
-                device.address()
-            )
-        );
-        device.unpair();
-    }
+    // if (!foundAdapter || !SimpleBLE::Adapter::bluetooth_enabled()){
+    //     return returnData;
+    // }
+    // this->hostAdapter.scan_for(scanDuration * 1000);
+    // for (SimpleBLE::Peripheral device : this->hostAdapter.scan_get_results()){
+    //     if (device.rssi() < -75){ continue; }
+    //     if (device.identifier().length() > 0){ continue; }
+    //     device.connect();
+    //     while (!device.is_connected()){
+    //         std::this_thread::sleep_for(
+    //             std::chrono::milliseconds(1)
+    //         );
+    //     }
+    //     while (device.identifier().length() == 0){
+    //         std::this_thread::sleep_for(
+    //             std::chrono::milliseconds(1)
+    //         );
+    //     }
+    //     returnData.push_back(
+    //         std::make_pair(
+    //             device.identifier(),
+    //             device.address()
+    //         )
+    //     );
+    //     device.unpair();
+    // }
     return returnData;
 }
 
@@ -77,20 +74,21 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
             std::cout << "ID length 0... connecting : asha.cpp 79" << std::endl;
-            try
-            {
+            try {
                 peer.connect();
-            }
-            catch(const std::exception& e)
-            {
+            } catch(const std::exception& e){
                 std::cerr << e.what() << " : 86 \n";
             }
             std::cout << "Connected : asha.cpp 88" << std::endl;
             continue;
         } else if (peer.is_connected()){
             std::cout << "Disconnecting : asha.cpp 91" << std::endl;
-            peer.unpair();
-            peer.disconnect();
+            try {
+                peer.unpair();
+                peer.disconnect();
+            } catch(const std::exception& e){
+                std::cerr << e.what() << " : 86 \n";
+            }
             std::cout << "Disconnected : asha.cpp 94" << std::endl;
         }
         std::cout << "Added device to results : asha.cpp 96" << std::endl;
@@ -136,6 +134,7 @@ bool ASHA::Peer::isASHA(){
     }
     for (SimpleBLE::Service serv : device.services()){
         if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
+            ASHA_UUID = serv.uuid();
             return true;
         }
     }
@@ -144,6 +143,12 @@ bool ASHA::Peer::isASHA(){
     return false;
 }
 
-
+void ASHA::Peer::getReadOnlyProperties(){
+    if (!isConnected() || (ASHA_UUID.length() == 0)){ return; }
+    std::string readData = device.read(ASHA_UUID, ROP_UUID);
+    if (sizeof(readData.c_str()) == sizeof(ASHA::ReadOnlyProperties)){
+        memcpy(&properties, readData.c_str(), 18);
+    }
+}
 
 #endif
