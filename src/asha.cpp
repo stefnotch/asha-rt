@@ -76,18 +76,14 @@ void ASHA::Adapter::updateScanResults(){
             std::cout << "ID length 0... connecting : asha.cpp 79" << std::endl;
             try {
                 peer.connect();
-            } catch(const std::exception& e){
-                std::cerr << e.what() << " : 86 \n";
+            } catch (std::exception connectError) {
             }
-            std::cout << "Connected : asha.cpp 88" << std::endl;
             continue;
         } else if (peer.is_connected()){
-            std::cout << "Disconnecting : asha.cpp 91" << std::endl;
             try {
                 peer.unpair();
                 peer.disconnect();
-            } catch(const std::exception& e){
-                std::cerr << e.what() << " : 86 \n";
+            } catch(std::exception disconnectError){
             }
             std::cout << "Disconnected : asha.cpp 94" << std::endl;
         }
