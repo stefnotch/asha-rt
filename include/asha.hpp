@@ -60,7 +60,9 @@ public:
     Peer(Adapter*, SimpleBLE::Peripheral&);
     bool isConnected();
     bool isASHA();
-    void getReadOnlyProperties();
+    bool getReadOnlyProperties();
+    Side getSide();
+    void unset();
 };
 
 struct ScanPeer {

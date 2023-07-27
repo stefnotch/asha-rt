@@ -63,69 +63,37 @@ void GUI::endBaseWindow(){
     ImGui::End();
 }
 
-void GUI::noAdapter(){
-    ImGui::OpenPopup("##bt_off");
-    if (ImGui::BeginPopupModal(
-        "##bt_off",
-        nullptr,
-        ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove
-    )){
-        ImGui::Text("No bluetooth adapter found", font_scale);
-        if (ImGui::Button("Exit")){
-            should_exit = true;
-        }
-        ImGui::SetWindowPos(ImVec2(
-            imgui_vp->GetWorkCenter().x - (ImGui::GetWindowSize().x*0.5),
-            imgui_vp->GetWorkCenter().y - (ImGui::GetWindowSize().y*0.5)
-        ));
-        ImGui::EndPopup();
-    }
+void GUI::styleButtonWhite(){
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 0.0, 0.0, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.9, 0.9, 0.9, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9, 0.9, 0.9, 0.8));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
 }
 
-void GUI::bluetoothOff(){
-    ImGui::OpenPopup("##bt_off");
+void GUI::drawError(std::string msg, std::string button, std::function<void()> lambda){
+    ImGui::OpenPopup("##error");
     if (ImGui::BeginPopupModal(
-        "##bt_off",
-        nullptr,
-        ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove | 
-        ImGuiWindowFlags_AlwaysUseWindowPadding
-    )){
-        ImGui::Text("Bluetooth off, please turn it on...", font_scale);
-        ImGui::SetWindowPos(ImVec2(
-            imgui_vp->GetWorkCenter().x - (ImGui::GetWindowSize().x*0.5),
-            imgui_vp->GetWorkCenter().y - (ImGui::GetWindowSize().y*0.5)
-        ));
-        if (ASHA::Adapter::isBluetoothOn()){
-            UI_State = STANDARD;
-        }
-        ImGui::EndPopup();
-    }
-}
-
-void GUI::notASHA(){
-    ImGui::OpenPopup("##not_ASHA");
-    if (ImGui::BeginPopupModal(
-        "##not_ASHA",
+        "##error",
         nullptr,
         ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoTitleBar
     )){
-        ImGui::Text("Not an ASHA device...", font_scale * 2);
-        if (ImGui::Button("Ok")){
-            UI_State = STANDARD;
+        ImGui::Text(msg.c_str(), font_scale);
+        if (button.length() > 0){
+            if (ImGui::Button(button.c_str())){
+                lambda();
+            }
+        } else {
+            lambda();
         }
         ImGui::SetWindowPos(ImVec2(
             imgui_vp->GetWorkCenter().x - (ImGui::GetWindowSize().x*0.5),
             imgui_vp->GetWorkCenter().y - (ImGui::GetWindowSize().y*0.5)
         ));
         ImGui::EndPopup();
-    }
+    }    
 }
 
 void GUI::drawLeftDevice(){
@@ -135,72 +103,21 @@ void GUI::drawLeftDevice(){
     buttonPos.y =  imgui_vp->Size.y * 0.15;
     buttonSize.x = imgui_vp->GetCenter().x * 0.5;
     buttonSize.y = buttonSize.x;
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0, 0.0, 1.0, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0, 0.0, 1.0, 0.8));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
     if (!devices.left.isConnected()){
         ImGui::SetCursorPos(buttonPos);
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0, 0.0, 1.0, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0, 0.0, 1.0, 0.8));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
-        if (ImGui::Button("Left Not Paired", buttonSize) || inLeftScan){
-            inLeftScan = true;
-            drawLeftSelect();
+        if (ImGui::Button("Left Not Paired", buttonSize)){
+            inScan = true;
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)){
             ImGui::SetTooltip("Click me to scan");
         }
-        ImGui::PopStyleColor(3);
-    }
-}
-
-void GUI::drawLeftSelect(){
-    if (!bt_adapter->isScanning()){
-        bt_adapter->startScan();
-        timer = precise_clock::now();
-    }
-    if (std::chrono::duration_cast<std::chrono::seconds>(precise_clock::now() - timer).count() >= 5){
-        bt_adapter->updateScanResults();
-    }
-    std::vector<ASHA::ScanPeer> results = bt_adapter->getLastScan();
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.0, 0.0, 1.0, 1.0));
-    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.0, 0.0, 1.0, 1.0));
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0.8, 0.8, 1.0));
-    ImGui::OpenPopup("Select Left Device");
-    if (!ImGui::BeginPopupModal(
-        "Select Left Device",
-        nullptr,
-        ImGuiWindowFlags_AlwaysAutoResize |
-        ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove
-    )){ ImGui::PopStyleColor(3); return; }
-    if (results.size() == 0){
-        ImGui::Text("Searching for devices...", font_scale);
     } else {
-        ImVec2 buttonSize = ImVec2(
-            imgui_vp->Size.x * 0.3,
-            imgui_vp->Size.y * 0.1
-        );
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 0.0, 0.0, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.9, 0.9, 0.9, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9, 0.9, 0.9, 0.8));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
-        for (ASHA::ScanPeer peer : results){
-            if (ImGui::Button(peer.name.c_str(), buttonSize)){
-                if (peer.peer.isASHA()){
-                    devices.left = peer.peer;
-                } else {
-                    UI_State = NOT_ASHA;
-                }
-            }
+        if (ImGui::Button("Connected", buttonSize)){
         }
-        ImGui::PopStyleColor(4);
     }
-    if (ImGui::Button("Stop")){
-        inLeftScan = false;
-    }
-    ImGui::SetWindowPos(ImVec2(
-        imgui_vp->GetWorkCenter().x - (ImGui::GetWindowSize().x*0.5),
-        imgui_vp->GetWorkCenter().y - (ImGui::GetWindowSize().y*0.5)
-    ));
-    ImGui::EndPopup();
     ImGui::PopStyleColor(3);
 }
 
@@ -211,23 +128,25 @@ void GUI::drawRightDevice(){
     buttonPos.y =  imgui_vp->Size.y * 0.15;
     buttonSize.x = imgui_vp->GetCenter().x * 0.5;
     buttonSize.y = buttonSize.x;
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0, 0.0, 0.0, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0, 0.0, 0.0, 0.8));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
     if (!devices.right.isConnected()){
         ImGui::SetCursorPos(buttonPos);
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0, 0.0, 0.0, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0, 0.0, 0.0, 0.8));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
-        if (ImGui::Button("Right Not Paired", buttonSize) || inRightScan){
-            inRightScan = true;
-            drawRightSelect();
+        if (ImGui::Button("Right Not Paired", buttonSize)){
+            inScan = true;
         }
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_None)){
             ImGui::SetTooltip("Click me to scan");
         }
-        ImGui::PopStyleColor(3);
+    } else {
+        if (ImGui::Button("Connected", buttonSize)){
+        }
     }
+    ImGui::PopStyleColor(3);
 }
 
-void GUI::drawRightSelect(){
+void GUI::drawScanMenu(){
     if (!bt_adapter->isScanning()){
         bt_adapter->startScan();
         timer = precise_clock::now();
@@ -236,48 +155,53 @@ void GUI::drawRightSelect(){
         bt_adapter->updateScanResults();
     }
     std::vector<ASHA::ScanPeer> results = bt_adapter->getLastScan();
-    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0, 0.0, 0.0, 1.0));
-    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(1.0, 0.0, 0.0, 1.0));
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0.8, 0.8, 1.0));
-    ImGui::OpenPopup("Select Right Device");
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(1.0, 1.0, 1.0, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(1.0, 1.0, 1.0, 1.0));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 0.0, 0.0, 1.0));
+    ImGui::OpenPopup("Select An ASHA Device");
     if (!ImGui::BeginPopupModal(
-        "Select Right Device",
+        "Select An ASHA Device",
         nullptr,
         ImGuiWindowFlags_AlwaysAutoResize |
         ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove
     )){ ImGui::PopStyleColor(3); return; }
+    ImGui::PopStyleColor(3);
+    styleButtonWhite();
     if (results.size() == 0){
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0, 1.0, 1.0, 1.0));
         ImGui::Text("Searching for devices...", font_scale);
+        ImGui::PopStyleColor();
     } else {
         ImVec2 buttonSize = ImVec2(
             imgui_vp->Size.x * 0.3,
             imgui_vp->Size.y * 0.1
         );
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0, 0.0, 0.0, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.9, 0.9, 0.9, 1.0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9, 0.9, 0.9, 0.8));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
         for (ASHA::ScanPeer peer : results){
             if (ImGui::Button(peer.name.c_str(), buttonSize)){
                 if (peer.peer.isASHA()){
-                    devices.right = peer.peer;
+                    if (peer.peer.getReadOnlyProperties()){
+                        if (peer.peer.getSide() == ASHA::Side::LEFT){
+                            devices.left = peer.peer;
+                        } else {
+                            devices.right = peer.peer;
+                        }
+                    }
                 } else {
                     UI_State = NOT_ASHA;
                 }
             }
         }
-        ImGui::PopStyleColor(4);
     }
     if (ImGui::Button("Stop")){
-        inRightScan = false;
+        inScan = false;
     }
+    ImGui::PopStyleColor(4);
     ImGui::SetWindowPos(ImVec2(
         imgui_vp->GetWorkCenter().x - (ImGui::GetWindowSize().x*0.5),
         imgui_vp->GetWorkCenter().y - (ImGui::GetWindowSize().y*0.5)
     ));
     ImGui::EndPopup();
-    ImGui::PopStyleColor(3);
 }
 
 void GUI::setNoAdapterFound(){
@@ -312,13 +236,29 @@ void GUI::run(){
         switch (UI_State)
         {
         case (NO_ADAPTER):
-            noAdapter();
+            drawError(
+                "No bluetooth adapter found", 
+                "Exit", 
+                [this](){this->should_exit = true;}
+            );
             break;
         case (BT_OFF):
-            bluetoothOff();
+            drawError(
+                "Bluetooth off, please turn back on", 
+                "", 
+                [this](){
+                    if (ASHA::Adapter::isBluetoothOn()){
+                        this->UI_State = STANDARD;
+                    }
+                }
+            );
             break;
         case (NOT_ASHA):
-            notASHA();
+            drawError(
+                "Not an ASHA device", 
+                "OK", 
+                [this](){this->UI_State = STANDARD;}
+            );
             break;
         default:
             if (!ASHA::Adapter::isBluetoothOn()){
@@ -327,6 +267,9 @@ void GUI::run(){
             }
             drawLeftDevice();
             drawRightDevice();
+            if (inScan){
+                drawScanMenu();
+            }
             break;
         }
         endBaseWindow();

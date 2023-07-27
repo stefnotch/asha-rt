@@ -38,21 +38,20 @@ private:
     ImGuiViewport             *imgui_vp;
     ASHA::Adapter             *bt_adapter;
     ASHA::DevicePair           devices;
-    bool                       inLeftScan  = false;
-    bool                       inRightScan = false;
+    bool                       inScan      = false;
     precise_clock::time_point  timer;
     enum {
         NO_ADAPTER, BT_OFF, NOT_ASHA, STANDARD
     } UI_State;
     void createBaseWindow();
     void endBaseWindow();
-    void noAdapter();
-    void bluetoothOff();
-    void notASHA();
+
+    void styleButtonWhite();
+
+    void drawError(std::string, std::string, std::function<void()>);
     void drawLeftDevice();
-    void drawLeftSelect();
     void drawRightDevice();
-    void drawRightSelect();
+    void drawScanMenu();
     void exit();
 protected:
 public:

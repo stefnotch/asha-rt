@@ -132,12 +132,36 @@ bool ASHA::Peer::isASHA(){
     return false;
 }
 
-void ASHA::Peer::getReadOnlyProperties(){
-    if (!isConnected() || (ASHA_UUID.length() == 0)){ return; }
+bool ASHA::Peer::getReadOnlyProperties(){
+    if (!isConnected()){
+        device.connect();
+    }
+    if (!isConnected() || (ASHA_UUID.length() == 0)){
+        return false;
+    }
     std::string readData = device.read(ASHA_UUID, ROP_UUID);
     if (sizeof(readData.c_str()) == sizeof(ASHA::ReadOnlyProperties)){
         memcpy(&properties, readData.c_str(), 18);
+        return true;
     }
+    return false;
 }
+
+ASHA::Side ASHA::Peer::getSide(){
+    if (!properties->VERSION){
+        throw std::runtime_error(
+            "Tried reading property before getting them"
+        );
+    }
+    if (properties->DC.side & Side::RIGHT){
+        return Side::RIGHT;
+    }
+    return Side::LEFT;
+}
+
+void ASHA::Peer::unset(){
+    deviceSet = false;
+}
+
 
 #endif
