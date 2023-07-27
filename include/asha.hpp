@@ -8,8 +8,8 @@
 #include <ios>
 #include <iostream>
 
-typedef uint16_t RenderDelay;
-typedef uint16_t CodecIDs;
+typedef unsigned char RenderDelay[2];
+typedef unsigned char CodecIDs[2];
 
 namespace ASHA {
 
@@ -95,8 +95,9 @@ struct ReadOnlyProperties {
     HiSyncID           HSID;
     FeatureMap         FM;
     RenderDelay        RD;
-    uint16_t           rsvd;
+    unsigned char      rsvd[2];
     CodecIDs           CIDs;
+    unsigned char      nulled;
 };
 
 }
