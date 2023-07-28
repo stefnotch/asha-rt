@@ -37,6 +37,7 @@ private:
     ImGuiContext              *im_ctx;
     ImGuiViewport             *imgui_vp;
     ASHA::Adapter             *bt_adapter  = new ASHA::Adapter();
+    ASHA::Peer                *tempDevice;
     ASHA::DevicePair           devices;
     bool                       inScan      = false;
     precise_clock::time_point  timer;

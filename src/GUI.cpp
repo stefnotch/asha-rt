@@ -183,6 +183,9 @@ void GUI::drawScanMenu(){
         );
         for (ASHA::ScanPeer peer : results){
             if (ImGui::Button(peer.name.c_str(), buttonSize)){
+                if (!peer.peer->isConnectable()){
+                    
+                }
                 if (peer.peer->isASHA()){
                     // if (peer.peer->getReadOnlyProperties()){
                     //     if (peer.peer->getSide() == ASHA::Side::LEFT){

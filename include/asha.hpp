@@ -54,6 +54,7 @@ private:
 public:
     Peer();
     Peer(SimpleBLE::Peripheral&);
+    bool isConnectable();
     bool isConnected();
     bool isPaired();
     bool isASHA();

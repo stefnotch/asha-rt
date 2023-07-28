@@ -71,6 +71,11 @@ ASHA::Peer::Peer(SimpleBLE::Peripheral &device){
     deviceSet = true;
 }
 
+bool ASHA::Peer::isConnectable(){
+    if (!deviceSet){ return false; }
+    return device.is_connectable();
+}
+
 bool ASHA::Peer::isConnected(){
     if (!deviceSet){ return false; }
     return device.is_connected();
@@ -82,23 +87,36 @@ bool ASHA::Peer::isPaired(){
 }
 
 bool ASHA::Peer::isASHA(){
+    std::string uuid;
     while (!isConnected()){
         try {
             device.connect();
         } catch (const std::exception e){
-            std::cout << e.what() << std::endl;
+            // std::cout << e.what() << std::endl;
         }
     }
-    std::cout << "Device services:" << std::endl;
-    for (SimpleBLE::Service serv : device.services()){
-        std::cout << "\t" << serv.uuid() << std::endl;
+
+    std::string output = "";
+    output.append("Device services:\n");
+    std::vector<SimpleBLE::Service> services = device.services();
+    for (SimpleBLE::Service serv : services){
+        try {
+            uuid = serv.uuid();
+        } catch (std::exception e){
+            continue;
+        }
+        output.append("\t");
+        output.append(uuid);
+        output.append("\n");
+        // std::cout << "\t" << serv.uuid() << std::endl;
         if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
-            ASHA_UUID = serv.uuid();
-            std::cout << "ASHA WAS FOUND!" << std::endl;
+            ASHA_UUID = uuid;
+            output.append("ASHA WAS FOUND!\n");
+            // std::cout << "ASHA WAS FOUND!" << std::endl;
             return true;
         }
     }
-    std::cout << std::endl;
+    output.append("\n");
     if (isPaired()){
         try {
             device.unpair();
@@ -111,6 +129,7 @@ bool ASHA::Peer::isASHA(){
         } catch(std::exception disconnectError){
         }
     }
+    std::cout << output;
     return false;
 }
 
