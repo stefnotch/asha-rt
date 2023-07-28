@@ -71,32 +71,30 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.rssi() < -75){ continue; }
         if (peer.manufacturer_data().size() == 0){ continue; }
         if (peer.identifier().length() == 0){
-            if (peer.is_connected()){ continue; }
-            for (auto &pair : peer.manufacturer_data()){
-                if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
-                    goto continue_outer;
-                }
-            }
+            if (peer.is_paired()){ continue; }
+            // for (auto &pair : peer.manufacturer_data()){
+            //     if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
+            //         goto continue_outer;
+            //     }
+            // }
             std::cout << "ID length 0... connecting" << std::endl;
             try {
                 peer.connect();
             } catch (std::exception connectError) {
             }
             continue;
-        } else {
-            if (peer.is_paired()){
-                try {
-                    peer.unpair();
-                } catch(std::exception disconnectError){
-                }
+        }
+        if (peer.is_connected()){
+            try {
+                peer.disconnect();
+            } catch(std::exception disconnectError){
             }
-            if (peer.is_connected()){
-                try {
-                    peer.disconnect();
-                } catch(std::exception disconnectError){
-                }
+        }
+        if (peer.is_paired()){
+            try {
+                peer.unpair();
+            } catch(std::exception disconnectError){
             }
-            std::cout << "Disconnected : asha.cpp 94" << std::endl;
         }
         lastScan.push_back(
             ASHA::ScanPeer{
