@@ -70,6 +70,7 @@ void ASHA::Adapter::updateScanResults(){
     std::vector<SimpleBLE::Peripheral> results = hostAdapter.scan_get_results();
     for (SimpleBLE::Peripheral peer : results){
         if (peer.rssi() < -75){ continue; }
+        if (peer.address_type() < 2){ continue; }
         if (peer.manufacturer_data().size() == 0){ continue; }
         if (peer.identifier().length() == 0){
             std::cout << "Address: " << peer.address() << std::endl;
