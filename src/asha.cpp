@@ -130,7 +130,11 @@ bool ASHA::Peer::isConnected(){
 
 bool ASHA::Peer::isASHA(){
     if (!isConnected()){
-        device.connect();
+        try {
+            device.connect();
+        } catch (const std::exception e){
+            return false;
+        }
     }
     for (SimpleBLE::Service serv : device.services()){
         if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
@@ -138,8 +142,10 @@ bool ASHA::Peer::isASHA(){
             return true;
         }
     }
-    device.unpair();
-    device.disconnect();
+    try {
+        device.unpair();
+        device.disconnect();
+    } catch (const std::exception e) {}
     return false;
 }
 
