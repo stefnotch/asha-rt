@@ -63,8 +63,8 @@ public:
 };
 
 struct ScanPeer {
-    std::string name;
-    ASHA::Peer  peer;
+    std::string  name;
+    ASHA::Peer  *peer;
 };
 
 struct DevicePair {

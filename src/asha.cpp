@@ -34,12 +34,19 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.rssi() < -75){ continue; }
         if (!peer.is_connectable()){ continue; }
         if (peer.identifier().length() == 0){ continue; }
-        if (peer.manufacturer_data().size() == 0){ continue; }        
+        if (peer.manufacturer_data().size() == 0){ continue; }
+
+        // if (peer.identifier().length() == 0){
+        //     peer.connect();
+        //     peer.disconnect();
+        //     peer.unpair();
+        //     continue;
+        // }
 
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
-                ASHA::Peer(peer)
+                new ASHA::Peer(peer)
             }
         );
     }
@@ -75,11 +82,11 @@ bool ASHA::Peer::isPaired(){
 }
 
 bool ASHA::Peer::isASHA(){
-    while (!isPaired()){
+    while (!isConnected()){
         try {
             device.connect();
         } catch (const std::exception e){
-            std::cout << "Failed to connect!" << std::endl;
+            std::cout << e.what() << std::endl;
         }
     }
     std::cout << "Device services:" << std::endl;

@@ -183,12 +183,12 @@ void GUI::drawScanMenu(){
         );
         for (ASHA::ScanPeer peer : results){
             if (ImGui::Button(peer.name.c_str(), buttonSize)){
-                if (peer.peer.isASHA()){
-                    if (peer.peer.getReadOnlyProperties()){
-                        if (peer.peer.getSide() == ASHA::Side::LEFT){
-                            devices.left = &peer.peer;
+                if (peer.peer->isASHA()){
+                    if (peer.peer->getReadOnlyProperties()){
+                        if (peer.peer->getSide() == ASHA::Side::LEFT){
+                            devices.left = peer.peer;
                         } else {
-                            devices.right = &peer.peer;
+                            devices.right = peer.peer;
                         }
                     }
                 } else {
