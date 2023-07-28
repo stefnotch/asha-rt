@@ -134,14 +134,14 @@ bool ASHA::Peer::isConnected(){
 }
 
 bool ASHA::Peer::isASHA(){
-    while (!isConnected()){
-        try {
-            device.connect();
-        } catch (const std::exception e){
-            std::cout << "Failed to connect!" << std::endl;
-            // return false;
-        }
-    }
+    // while (!isConnected()){
+    //     try {
+    //         device.connect();
+    //     } catch (const std::exception e){
+    //         std::cout << "Failed to connect!" << std::endl;
+    //         // return false;
+    //     }
+    // }
     std::cout << "Device services:" << std::endl;
     for (SimpleBLE::Service serv : device.services()){
         std::cout << "\t" << serv.uuid() << std::endl;
