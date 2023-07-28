@@ -42,6 +42,10 @@ GUI::GUI(std::string title, int width, int height){
     ImGui::StyleColorsDark();
     font_scale = io.FontGlobalScale * 2;
     io.FontGlobalScale = font_scale;
+
+    if (!bt_adapter->isApapterFound()){
+        UI_State = NO_ADAPTER;
+    }
 }
 
 void GUI::createBaseWindow(){
@@ -106,7 +110,7 @@ void GUI::drawLeftDevice(){
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0, 0.0, 1.0, 1.0));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0, 0.0, 1.0, 0.8));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
-    if (!devices.left.isConnected()){
+    if (!devices.left->isConnected()){
         ImGui::SetCursorPos(buttonPos);
         if (ImGui::Button("Left Not Paired", buttonSize)){
             inScan = true;
@@ -131,7 +135,7 @@ void GUI::drawRightDevice(){
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0, 0.0, 0.0, 1.0));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0, 0.0, 0.0, 0.8));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0, 0.0, 0.0, 1.0));
-    if (!devices.right.isConnected()){
+    if (!devices.right->isConnected()){
         ImGui::SetCursorPos(buttonPos);
         if (ImGui::Button("Right Not Paired", buttonSize)){
             inScan = true;
@@ -182,9 +186,9 @@ void GUI::drawScanMenu(){
                 if (peer.peer.isASHA()){
                     if (peer.peer.getReadOnlyProperties()){
                         if (peer.peer.getSide() == ASHA::Side::LEFT){
-                            devices.left = peer.peer;
+                            devices.left = &peer.peer;
                         } else {
-                            devices.right = peer.peer;
+                            devices.right = &peer.peer;
                         }
                     }
                 } else {
@@ -210,10 +214,6 @@ void GUI::setNoAdapterFound(){
 
 void GUI::setBluetoothOff(){
     UI_State = BT_OFF;
-}
-
-void GUI::assignAdapter(ASHA::Adapter *adapter){
-    bt_adapter = adapter;
 }
 
 void GUI::run(){

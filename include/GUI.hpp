@@ -36,7 +36,7 @@ private:
     GLFWwindow                *wm_ctx;
     ImGuiContext              *im_ctx;
     ImGuiViewport             *imgui_vp;
-    ASHA::Adapter             *bt_adapter;
+    ASHA::Adapter             *bt_adapter  = new ASHA::Adapter();
     ASHA::DevicePair           devices;
     bool                       inScan      = false;
     precise_clock::time_point  timer;
@@ -58,6 +58,6 @@ public:
     GUI(std::string, int, int);
     void setNoAdapterFound();
     void setBluetoothOff();
-    void assignAdapter(ASHA::Adapter*);
+    void assignAdapter(ASHA::Adapter&);
     void run();
 };
