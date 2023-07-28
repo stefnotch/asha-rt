@@ -2,7 +2,7 @@
 #define ASHA_H
 
 #include <asha.hpp>
-#include <bitset>
+#include <thread>
 
 const std::vector<uint16_t> MFRs = {
     0x0647 /* MED-EL*/, 0x0A43 /* COCHLEAR*/,
@@ -70,7 +70,6 @@ void ASHA::Adapter::updateScanResults(){
     std::vector<SimpleBLE::Peripheral> results = hostAdapter.scan_get_results();
     for (SimpleBLE::Peripheral peer : results){
         if (peer.rssi() < -75){ continue; }
-        if (peer.address_type() < 2){ continue; }
         if (peer.manufacturer_data().size() == 0){ continue; }
         if (peer.identifier().length() == 0){
             std::cout << "Address: " << peer.address() << std::endl;
@@ -88,6 +87,9 @@ void ASHA::Adapter::updateScanResults(){
             //         goto continue_outer;
             //     }
             // }
+            std::this_thread::sleep_for(
+                std::chrono::seconds(1)
+            );
             try {
                 peer.connect();
             } catch (std::exception connectError) {
