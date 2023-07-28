@@ -60,6 +60,7 @@ public:
     Peer();
     Peer(Adapter*, SimpleBLE::Peripheral&);
     bool isConnected();
+    bool isPaired();
     bool isASHA();
     bool getReadOnlyProperties();
     Side getSide();

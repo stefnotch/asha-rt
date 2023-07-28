@@ -70,11 +70,9 @@ void ASHA::Adapter::updateScanResults(){
     for (SimpleBLE::Peripheral peer : results){
         if (peer.rssi() < -75){ continue; }
         if (peer.manufacturer_data().size() == 0){ continue; }
-        // if (peer.stx_power() > -32768){ continue; }
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
             for (auto &pair : peer.manufacturer_data()){
-                // std::cout << pair.first << std::endl;
                 if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
                     goto continue_outer;
                 }
@@ -85,14 +83,18 @@ void ASHA::Adapter::updateScanResults(){
             } catch (std::exception connectError) {
             }
             continue;
-        } else if (peer.is_connected()){
-            try {
-                peer.unpair();
-            } catch(std::exception disconnectError){
+        } else {
+            if (peer.is_paired()){
+                try {
+                    peer.unpair();
+                } catch(std::exception disconnectError){
+                }
             }
-            try {
-                peer.disconnect();
-            } catch(std::exception disconnectError){
+            if (peer.is_connected()){
+                try {
+                    peer.disconnect();
+                } catch(std::exception disconnectError){
+                }
             }
             std::cout << "Disconnected : asha.cpp 94" << std::endl;
         }
@@ -133,6 +135,13 @@ bool ASHA::Peer::isConnected(){
     return false;
 }
 
+bool ASHA::Peer::isPaired(){
+    if (deviceSet){
+        return device.is_paired();
+    }
+    return false;
+}
+
 bool ASHA::Peer::isASHA(){
     // while (!isConnected()){
     //     try {
@@ -151,13 +160,17 @@ bool ASHA::Peer::isASHA(){
         }
     }
     std::cout << std::endl;
-    try {
-        device.unpair();
-    } catch(std::exception disconnectError){
+    if (isPaired()){
+        try {
+            device.unpair();
+        } catch(std::exception disconnectError){
+        }
     }
-    try {
-        device.disconnect();
-    } catch(std::exception disconnectError){
+    if (isConnected()){
+        try {
+            device.disconnect();
+        } catch(std::exception disconnectError){
+        }
     }
     return false;
 }
