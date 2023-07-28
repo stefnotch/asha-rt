@@ -3,6 +3,11 @@
 
 #include <asha.hpp>
 
+const std::vector<uint16_t> MFRs = {
+    0x0647 /* MED-EL*/, 0x0A43 /* COCHLEAR*/,
+    0x01BB /* AB*/
+};
+
 ASHA::Adapter::Adapter(){
     std::vector<SimpleBLE::Adapter> adapters = SimpleBLE::Adapter::get_adapters();
     if (adapters.size() <= 0){
@@ -67,7 +72,12 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.manufacturer_data().size() == 0){ continue; }
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
-            std::cout << "ID length 0... connecting : asha.cpp 79" << std::endl;
+            for (auto &pair : peer.manufacturer_data()){
+                if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
+                    goto continue_outer;
+                }
+            }
+            std::cout << "ID length 0... connecting" << std::endl;
             try {
                 peer.connect();
             } catch (std::exception connectError) {
@@ -87,6 +97,7 @@ void ASHA::Adapter::updateScanResults(){
                 ASHA::Peer(this, peer)
             }
         );
+        continue_outer:;
     }
     hostAdapter.scan_stop();
 }

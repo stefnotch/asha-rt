@@ -1,5 +1,6 @@
 #include <simpleble/SimpleBLE.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstring>
 #include <string>
