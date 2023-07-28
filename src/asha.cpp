@@ -2,6 +2,7 @@
 #define ASHA_H
 
 #include <asha.hpp>
+#include <bitset>
 
 const std::vector<uint16_t> MFRs = {
     0x0647 /* MED-EL*/, 0x0A43 /* COCHLEAR*/,
@@ -71,17 +72,26 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.rssi() < -75){ continue; }
         if (peer.manufacturer_data().size() == 0){ continue; }
         if (peer.identifier().length() == 0){
-            if (peer.is_paired()){ continue; }
+            std::cout << "Address: " << peer.address() << std::endl;
+            std::cout << "Address Type: " << peer.address_type() << std::endl;
+            std::cout << "Is Connectable: " << peer.is_connectable() << std::endl;
+            std::cout << "Is Connected: " << peer.is_connected() << std::endl;
+            std::cout << "Is Paired: " << peer.is_paired() << std::endl;
+            std::cout << "MFR Data Size: " << peer.manufacturer_data().size() << std::endl;
+            std::cout << "MTU: " << peer.mtu() << std::endl;
+            std::cout << "Number Of Services: " << peer.services().size() << std::endl;
+            std::cout << "TX Power: " << peer.tx_power() << std::endl;
+            // if (peer.is_paired()){ continue; }
             // for (auto &pair : peer.manufacturer_data()){
             //     if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
             //         goto continue_outer;
             //     }
             // }
-            std::cout << "ID length 0... connecting" << std::endl;
             try {
                 peer.connect();
             } catch (std::exception connectError) {
             }
+            std::cout << "Connected successfully" << std::endl << std::endl;
             continue;
         }
         if (peer.is_connected()){
