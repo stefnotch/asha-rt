@@ -93,7 +93,7 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.is_paired()){
             try {
                 peer.unpair();
-            } catch(std::exception disconnectError){
+            } catch(std::exception unpairError){
             }
         }
         lastScan.push_back(
