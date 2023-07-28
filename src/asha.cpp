@@ -74,10 +74,10 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
             for (auto &pair : peer.manufacturer_data()){
-                std::cout << pair.first << std::endl;
-                // if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
-                //     goto continue_outer;
-                // }
+                // std::cout << pair.first << std::endl;
+                if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
+                    goto continue_outer;
+                }
             }
             std::cout << "ID length 0... connecting" << std::endl;
             try {
