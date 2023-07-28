@@ -47,15 +47,13 @@ public:
 
 class Peer {
 private:
-    ASHA::Adapter             *adapter;
-    bool                       adapterSet = false;
-    SimpleBLE::Peripheral     *device;
+    SimpleBLE::Peripheral      device;
     bool                       deviceSet  = false;
     std::string                ASHA_UUID    = "";
     struct ReadOnlyProperties *properties;
 public:
     Peer();
-    Peer(Adapter*, SimpleBLE::Peripheral*);
+    Peer(SimpleBLE::Peripheral&);
     bool isConnected();
     bool isPaired();
     bool isASHA();

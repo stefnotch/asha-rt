@@ -39,7 +39,7 @@ void ASHA::Adapter::updateScanResults(){
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
-                ASHA::Peer(this, &peer)
+                ASHA::Peer(peer)
             }
         );
     }
@@ -59,32 +59,31 @@ void ASHA::Adapter::scanConnect(SimpleBLE::Peripheral &peer){
 ///////////////////////////////////////////////////////////////////////////////////
 ASHA::Peer::Peer(){}
 
-ASHA::Peer::Peer(ASHA::Adapter* hostAdapter, SimpleBLE::Peripheral* device){
-    adapter = hostAdapter;
+ASHA::Peer::Peer(SimpleBLE::Peripheral &device){
     this->device = device;
     deviceSet = true;
 }
 
 bool ASHA::Peer::isConnected(){
     if (!deviceSet){ return false; }
-    return device->is_connected() && deviceSet;
+    return device.is_connected();
 }
 
 bool ASHA::Peer::isPaired(){
     if (!deviceSet){ return false; }
-    return device->is_paired();
+    return device.is_paired();
 }
 
 bool ASHA::Peer::isASHA(){
     while (!isPaired()){
         try {
-            device->connect();
+            device.connect();
         } catch (const std::exception e){
             std::cout << "Failed to connect!" << std::endl;
         }
     }
     std::cout << "Device services:" << std::endl;
-    for (SimpleBLE::Service serv : device->services()){
+    for (SimpleBLE::Service serv : device.services()){
         std::cout << "\t" << serv.uuid() << std::endl;
         if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
             ASHA_UUID = serv.uuid();
@@ -94,13 +93,13 @@ bool ASHA::Peer::isASHA(){
     std::cout << std::endl;
     if (isPaired()){
         try {
-            device->unpair();
+            device.unpair();
         } catch(std::exception disconnectError){
         }
     }
     if (isConnected()){
         try {
-            device->disconnect();
+            device.disconnect();
         } catch(std::exception disconnectError){
         }
     }
@@ -109,12 +108,12 @@ bool ASHA::Peer::isASHA(){
 
 bool ASHA::Peer::getReadOnlyProperties(){
     if (!isConnected()){
-        device->connect();
+        device.connect();
     }
     if (!isConnected() || (ASHA_UUID.length() == 0)){
         return false;
     }
-    std::string readData = device->read(ASHA_UUID, ROP_UUID);
+    std::string readData = device.read(ASHA_UUID, ROP_UUID);
     if (sizeof(readData.c_str()) == sizeof(ASHA::ReadOnlyProperties)){
         memcpy(&properties, readData.c_str(), 18);
         return true;
