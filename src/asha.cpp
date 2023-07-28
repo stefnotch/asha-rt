@@ -94,6 +94,7 @@ bool ASHA::Peer::isASHA(){
         std::cout << "\t" << serv.uuid() << std::endl;
         if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
             ASHA_UUID = serv.uuid();
+            std::cout << "ASHA WAS FOUND!" << std::endl;
             return true;
         }
     }
