@@ -74,9 +74,10 @@ void ASHA::Adapter::updateScanResults(){
         if (peer.identifier().length() == 0){
             if (peer.is_connected()){ continue; }
             for (auto &pair : peer.manufacturer_data()){
-                if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
-                    goto continue_outer;
-                }
+                std::cout << pair.first << std::endl;
+                // if (!std::binary_search(MFRs.begin(), MFRs.end(), pair.first)){
+                //     goto continue_outer;
+                // }
             }
             std::cout << "ID length 0... connecting" << std::endl;
             try {
@@ -87,6 +88,9 @@ void ASHA::Adapter::updateScanResults(){
         } else if (peer.is_connected()){
             try {
                 peer.unpair();
+            } catch(std::exception disconnectError){
+            }
+            try {
                 peer.disconnect();
             } catch(std::exception disconnectError){
             }
@@ -130,7 +134,7 @@ bool ASHA::Peer::isConnected(){
 }
 
 bool ASHA::Peer::isASHA(){
-    if (!isConnected()){
+    while (!isConnected()){
         try {
             device.connect();
         } catch (const std::exception e){
@@ -149,8 +153,12 @@ bool ASHA::Peer::isASHA(){
     std::cout << std::endl;
     try {
         device.unpair();
+    } catch(std::exception disconnectError){
+    }
+    try {
         device.disconnect();
-    } catch (const std::exception e) {}
+    } catch(std::exception disconnectError){
+    }
     return false;
 }
 
