@@ -151,7 +151,7 @@ void GUI::drawScanMenu(){
         bt_adapter->startScan();
         timer = precise_clock::now();
     }
-    if (std::chrono::duration_cast<std::chrono::seconds>(precise_clock::now() - timer).count() >= 5){
+    if (std::chrono::duration_cast<std::chrono::seconds>(precise_clock::now() - timer).count() >= 1){
         bt_adapter->updateScanResults();
     }
     std::vector<ASHA::ScanPeer> results = bt_adapter->getLastScan();
