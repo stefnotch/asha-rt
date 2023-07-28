@@ -71,39 +71,27 @@ void ASHA::Adapter::updateScanResults(){
     hostAdapter.scan_stop();
     for (SimpleBLE::Peripheral peer : results){
         if (peer.rssi() < -75){ continue; }
-        if (peer.manufacturer_data().size() == 0){ continue; }
         if (!peer.is_connectable()){ continue; }
-        
-        if (peer.identifier().length() == 0){
-            std::this_thread::sleep_for(
-                std::chrono::seconds(1)
-            );
-            try {
-                peer.connect();
-            } catch (std::exception connectError) {
-            }
-            std::cout << "Connected successfully" << std::endl << std::endl;
-            continue;
-        }
-        if (peer.is_connected()){
-            try {
-                peer.disconnect();
-            } catch(std::exception disconnectError){
-            }
-        }
-        if (peer.is_paired()){
-            try {
-                peer.unpair();
-            } catch(std::exception unpairError){
-            }
-        }
+        if (peer.identifier().length() == 0){ continue; }
+        if (peer.manufacturer_data().size() == 0){ continue; }        
+
+        // if (peer.identifier().length() == 0){
+        //     std::this_thread::sleep_for(
+        //         std::chrono::seconds(1)
+        //     );
+        //     try {
+        //         peer.connect();
+        //     } catch (std::exception connectError) {
+        //     }
+        //     std::cout << "Connected successfully" << std::endl << std::endl;
+        //     continue;
+        // }
         lastScan.push_back(
             ASHA::ScanPeer{
                 peer.identifier(),
                 ASHA::Peer(this, peer)
             }
         );
-        continue_outer:;
     }
 }
 
