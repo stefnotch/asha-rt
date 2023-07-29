@@ -89,13 +89,13 @@ bool ASHA::Peer::isPaired(){
 
 bool ASHA::Peer::isASHA(){
     std::string uuid;
-    while (!isConnected()){
-        try {
-            device.connect();
-        } catch (const std::exception e){
-            // std::cout << e.what() << std::endl;
-        }
-    }
+    // while (!isConnected()){
+    //     try {
+    //         device.connect();
+    //     } catch (const std::exception e){
+    //         // std::cout << e.what() << std::endl;
+    //     }
+    // }
 
     std::string output = "";
     output.append("Device services:\n");
