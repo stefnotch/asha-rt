@@ -99,7 +99,15 @@ bool ASHA::Peer::isASHA(){
 
     std::string output = "";
     output.append("Device services:\n");
-    std::vector<SimpleBLE::Service> services = device.services();
+    std::vector<SimpleBLE::Service> services;
+    try {
+        services = device.services();
+    } catch (std::exception e) {
+        output.append("Could not get services\n");
+        output.append(e.what());
+        std::cout << output << std::endl;
+        return false;
+    }
     for (SimpleBLE::Service serv : services){
         try {
             uuid = serv.uuid();
