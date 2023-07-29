@@ -96,6 +96,11 @@ bool ASHA::Peer::isASHA(){
     //         // std::cout << e.what() << std::endl;
     //     }
     // }
+    try {
+        device.connect();
+    } catch (const std::exception e){
+        return false;
+    }
 
     std::string output = "";
     output.append("Device services:\n");
