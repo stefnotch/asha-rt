@@ -45,6 +45,7 @@ void ASHA::Adapter::updateScanResults(){
 
         lastScan.push_back(
             ASHA::ScanPeer{
+                // std::string(".").append(peer.identifier()),
                 peer.identifier(),
                 new ASHA::Peer(peer)
             }
@@ -109,10 +110,10 @@ bool ASHA::Peer::isASHA(){
         output.append(uuid);
         output.append("\n");
         // std::cout << "\t" << serv.uuid() << std::endl;
-        if (serv.uuid().substr(0, 8) == ASHA::SERVICE_UUID){
+        if (uuid.substr(0, 8) == ASHA::SERVICE_UUID){
             ASHA_UUID = uuid;
             output.append("ASHA WAS FOUND!\n");
-            // std::cout << "ASHA WAS FOUND!" << std::endl;
+            std::cout << output << std::endl;
             return true;
         }
     }
